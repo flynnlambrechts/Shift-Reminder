@@ -37,7 +37,7 @@ def calendar_service():
             token.write(creds.to_json())
 
     try:
-        service = build('calendar', 'v3', credentials=creds)
+        service = build('calendar', 'v3', credentials=creds, static_discovery=False)
     except HttpError as error:
         print('An error occurred: %s' % error)
     

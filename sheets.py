@@ -16,7 +16,6 @@ from constants import SCOPES, TOKEN_PATH
 from classes import Shift, Event
 from util import date_to_dt, time_to_dt
 
-
 # The ID and range of a sample spreadsheet.
 # SPREADSHEET_ID = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms'
 TESTING = True
@@ -28,6 +27,7 @@ DATA_RANGE = "A3:J100"
 SAMPLE_RANGE_NAME = 'December 2022!A3:J81'
 
 NAME = "Flynn"
+
 
 def get_sheets_service():
     creds = None
@@ -49,8 +49,11 @@ def get_sheets_service():
             token.write(creds.to_json())
 
     try:
-        service = build('sheets', 'v4', credentials=creds)
-        
+        service = build('sheets',
+                        'v4',
+                        credentials=creds,
+                        static_discovery=False)
+
     except HttpError as err:
         print(err)
 
@@ -60,7 +63,8 @@ def get_sheets_service():
 def get_sheets():
     titles = []
 
-    sheet_metadata = get_sheets_service().spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
+    sheet_metadata = get_sheets_service().spreadsheets().get(
+        spreadsheetId=SPREADSHEET_ID).execute()
     sheets = sheet_metadata.get('sheets', '')
     for sheet in sheets:
         titles.append(sheet.get("properties", {}).get("title", "Sheet1"))
@@ -73,6 +77,7 @@ def get_sheets():
     except:
         pass
     return titles
+
 
 def get_future_sheets():
     sheets = get_sheets()
@@ -89,7 +94,6 @@ def get_future_sheets():
                 future_sheets.append(title)
                 continue
 
-            
         now = datetime.now()
         # now = datetime(2023, 1, 1)
         now = datetime(now.year, now.month, 1)
@@ -98,12 +102,15 @@ def get_future_sheets():
             future_sheets.append(title)
     return future_sheets
 
+
 def save_shifts(shifts):
     with open("shifts.csv", "w") as f:
         for shift in shifts:
-            f.write(f""""{shift[1]}","{shift[3]}","{shift[0]}","{shift[2]}"\n""")
+            f.write(
+                f""""{shift[1]}","{shift[3]}","{shift[0]}","{shift[2]}"\n""")
             # f.write(shift[0])
             # f.write("\n")
+
 
 def row_to_event(headers, row):
     event = Event()
@@ -129,7 +136,7 @@ def row_to_event(headers, row):
             header = header.replace("\n", " ")
             content = row[i].replace("\n", " ")
             event.description += f"{header.capitalize()}: {content}\n"
-        
+
     # print(start_time, end_time, date)
     if (isinstance(start_time, str)):
         event.description += f"Bad Start Time: {start_time}\n"
@@ -143,9 +150,12 @@ def row_to_event(headers, row):
     event.start_time = datetime.combine(date, start_time)
     event.end_time = datetime.combine(date, end_time)
 
-    event.end_time = event.start_time + timedelta(hours = 1) if event.start_time == event.end_time else event.end_time
-    event.end_time = event.end_time + timedelta(days = 1) if event.start_time > event.end_time else event.end_time
+    event.end_time = event.start_time + timedelta(
+        hours=1) if event.start_time == event.end_time else event.end_time
+    event.end_time = event.end_time + timedelta(
+        days=1) if event.start_time > event.end_time else event.end_time
     return event
+
 
 def get_crew_from_row(row, headers):
     for i, header in enumerate(headers):
@@ -157,7 +167,7 @@ def get_crew_from_row(row, headers):
                 raise ValueError(f"No crew found in {row}")
             else:
                 return row[i]
-    
+
     raise ValueError(f"No crew found in {row}")
 
 
@@ -179,15 +189,13 @@ def get_shifts():
             print('No data found.')
             return
 
-
-        # Here we convert the data to pandas dataframe 
+        # Here we convert the data to pandas dataframe
         # Since otherwise empty cells are left out
         df = pd.DataFrame(values)
         df_replace = df.replace([''], [None])
         # print(tabulate(df, headers='keys', tablefmt='psql'))
         values = df_replace.values.tolist()
 
-        
         headers = values[0]
         for i, row in enumerate(values[1:]):
             if row == []:

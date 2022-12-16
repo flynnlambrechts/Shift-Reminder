@@ -1,19 +1,9 @@
 from time import sleep
-# import os
 
 # from classes import Event
 from keep_alive import keep_alive
 from sheets import get_shifts
 from cal import get_cal_events, calendar_service
-
-
-# try:
-#     RUNNING = os.environ["REPLIT"]
-#     API_KEY = os.environ['API_KEY']
-# except KeyError:
-#     RUNNING = "LOCAL"
-#     API_KEY = None
-
 
 
 def search_events(name, events):
@@ -56,8 +46,9 @@ def update_calendar():
 
 
 if __name__ == "__main__":
-    # keep_alive()
+    keep_alive()
     while True:
         update_calendar()
-        # Update every 6hrs
-        sleep(21600)
+        # Update every 3hrs
+        sleep(3 * 60 * 60)
+        print("Running...")
