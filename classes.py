@@ -75,10 +75,11 @@ class Event:
                 existing_event['location'] == self.location and
                 existing_event['start'].get('dateTime', existing_event['start'].get('date')) == dt_to_string(self.start_time) and
                 existing_event['end'].get('dateTime', existing_event['end'].get('date')) == dt_to_string(self.end_time)):
-                print("Update not required")
+                # print("Update not required for")
                 return
 
-            print("Update required")
+            # print("Updating ", self.summary)
+            print(f"""'{self.summary}'*""", end=" ")
             service.events().update(calendarId = CALENDAR_ID, eventId=e_id,
                                     body=self.get()).execute()
         except HttpError as err:
@@ -87,7 +88,6 @@ class Event:
                 self.create(service)
             else:
                 raise
-
     def __str__(self):
         return f"{self.summary}: \n\tAt: {self.location} \n\tStarting: {self.start_time} \n\tEnding: {self.end_time}\n"
     def __repr__(self):

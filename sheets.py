@@ -12,21 +12,15 @@ from datetime import datetime, timedelta
 import pandas as pd
 from tabulate import tabulate
 
-from constants import SCOPES, TOKEN_PATH
+from constants import SCOPES, TOKEN_PATH, SPREADSHEET_ID, NAME
 from classes import Shift, Event
-from util import date_to_dt, time_to_dt
+from util import date_to_dt, time_to_dt, strip_string_list
 
-# The ID and range of a sample spreadsheet.
-# SPREADSHEET_ID = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms'
-TESTING = True
-SPREADSHEET_ID = '14iS3o_ydZYTHRvi63gw4X8GWKVLyxmkQJgVkoTDTSNA'
-TESTING_SPREADSHEET_ID = '1po6yOEeeNqB_QW7iiivw9v-DQyerGAKE_qSEImU9FOg'
-SPREADSHEET_ID = TESTING_SPREADSHEET_ID if TESTING else SPREADSHEET_ID
 
 DATA_RANGE = "A3:J100"
 SAMPLE_RANGE_NAME = 'December 2022!A3:J81'
 
-NAME = "Flynn"
+
 
 
 def get_sheets_service():
@@ -113,6 +107,8 @@ def save_shifts(shifts):
 
 
 def row_to_event(headers, row):
+    headers = strip_string_list(headers)
+    row = strip_string_list(row)
     event = Event()
     date = None
     start_time = None
@@ -140,11 +136,11 @@ def row_to_event(headers, row):
     # print(start_time, end_time, date)
     if (isinstance(start_time, str)):
         event.description += f"Bad Start Time: {start_time}\n"
-        print("Bad Start Time", start_time)
+        # print("Bad Start Time", start_time)
         start_time = time_to_dt("12:00")
     if isinstance(end_time, str):
         event.description += f"Bad End Time: {end_time}\n"
-        print("Bad End Time", end_time)
+        # print("Bad End Time", end_time)
         end_time = time_to_dt("23:59")
 
     event.start_time = datetime.combine(date, start_time)
@@ -177,16 +173,16 @@ def get_shifts():
     # Call the Sheets API
     sheet = get_sheets_service().spreadsheets()
     titles = get_future_sheets()
-    print("Scanning sheets:\n", titles)
+    print(f"""Scanning sheets:\n    '{"' '".join(titles)}'""")
     # titles = ["November 2022"]
     for title in titles:
-        print("Sheet:", title)
+        # print("Sheet:", title)
         result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
                                     range=f"{title}!{DATA_RANGE}").execute()
         values = result.get('values', [])
 
         if not values:
-            print('No data found.')
+            print('No data found in ', title, ".")
             return
 
         # Here we convert the data to pandas dataframe

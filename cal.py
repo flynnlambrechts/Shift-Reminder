@@ -51,7 +51,7 @@ def create_event(event):
 def get_cal_events(from_time = datetime.now()):
     service = calendar_service()
     # now = datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-    print('Getting the upcoming events')
+    print('Getting the existing upcoming events...')
     events_result = service.events().list(calendarId=CALENDAR_ID, 
                                           timeMin=dt_to_string(from_time),
                                         #   maxResults=10, 
@@ -60,10 +60,13 @@ def get_cal_events(from_time = datetime.now()):
     # print(events_result)   
                                       
     events = events_result.get('items', [])
+    
 
     if not events:
         print('No upcoming events found.')
         return
+
+    print(len(events), "Found")
 
     events_list = {}
 
