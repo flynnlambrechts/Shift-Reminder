@@ -1,7 +1,10 @@
-from classes import Event
+# from classes import Event
+from keep_alive import keep_alive
 
 from sheets import get_shifts
 from cal import get_cal_events, calendar_service
+from time import sleep
+
 
 def search_events(name, events):
     if events == None:
@@ -13,6 +16,7 @@ def search_events(name, events):
 
     return False
 
+
 def earliest_time(shifts):
     earliest = shifts[0].start_time
     for event in shifts[1:]:
@@ -23,7 +27,8 @@ def earliest_time(shifts):
 
 # Can have same name but on different days
 
-if __name__ == "__main__":
+
+def update_calendar():
     service = calendar_service()
     shifts = get_shifts()
 
@@ -40,3 +45,9 @@ if __name__ == "__main__":
             shift.update(service, event_exists)
 
 
+if __name__ == "__main__:
+    keep_alive()
+    while True:
+        update_calendar()
+        # Update every 6hrs
+        sleep(21600)
