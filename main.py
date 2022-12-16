@@ -13,12 +13,24 @@ def search_events(name, events):
 
     return False
 
+def earliest_time(shifts):
+    earliest = shifts[0].start_time
+    for event in shifts[1:]:
+        if event.start_time < earliest:
+            earliest = event.start_time
+    return earliest
+
+
 # Can have same name but on different days
 
 if __name__ == "__main__":
     service = calendar_service()
     shifts = get_shifts()
-    events = get_cal_events()
+
+    if (len(shifts) == 0):
+        exit
+
+    events = get_cal_events(earliest_time(shifts))
 
     for shift in shifts:
         event_exists = search_events(shift.summary, events)

@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-import datetime
+from datetime import datetime
 import dateutil.parser
 import os.path
 import json
@@ -13,6 +13,7 @@ from googleapiclient.errors import HttpError
 
 from constants import SCOPES, TOKEN_PATH, CALENDAR_ID
 from classes import Event
+from util import dt_to_string
 
 
 
@@ -47,12 +48,12 @@ def create_event(event):
     event = calendar_service().events().insert(calendarId=CALENDAR_ID, body=event.get()).execute()
 
 
-def get_cal_events():
+def get_cal_events(from_time = datetime.now()):
     service = calendar_service()
-    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+    # now = datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
     print('Getting the upcoming events')
     events_result = service.events().list(calendarId=CALENDAR_ID, 
-                                          timeMin=now,
+                                          timeMin=dt_to_string(from_time),
                                         #   maxResults=10, 
                                           singleEvents=True,
                                           orderBy='startTime').execute()

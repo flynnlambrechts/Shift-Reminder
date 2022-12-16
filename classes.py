@@ -73,8 +73,8 @@ class Event:
             existing_event = service.events().get(calendarId=CALENDAR_ID, eventId=e_id).execute()
             if (existing_event['description'] == self.description and
                 existing_event['location'] == self.location and
-                existing_event['start'].get('dateTime', existing_event['start'].get('date')) == dt_to_string(self.start_time) + "+11:00" and
-                existing_event['end'].get('dateTime', existing_event['end'].get('date')) == dt_to_string(self.end_time) + "+11:00"):
+                existing_event['start'].get('dateTime', existing_event['start'].get('date')) == dt_to_string(self.start_time) and
+                existing_event['end'].get('dateTime', existing_event['end'].get('date')) == dt_to_string(self.end_time)):
                 print("Update not required")
                 return
 
