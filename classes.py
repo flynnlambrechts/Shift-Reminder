@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from googleapiclient.errors import HttpError
 
 from util import dt_to_string
-from constants import TIMEZONE_STR, CALENDAR_ID
+from constants import TIMEZONE_STR, CALENDAR_ID, PAY_RATE
 
 class Shift:
     def __init__(self, headers, data):
@@ -24,9 +24,16 @@ class Event:
         self.summary = name
         self.location = location
         self.description = description
-        self.start_time = start_time
-        self.end_time = end_time
-        # print(self.end_time)
+        self.pay = PAY_RATE * 4
+        
+        
+    def estimate_pay(self):
+        length = (self.end_time - self.start_time).seconds/(60*60)
+        est_pay = PAY_RATE * 4 if length < 4 else length * PAY_RATE
+        self.description += f"Estimated Pay = ${est_pay:0.2f}\n"
+        self.pay = est_pay
+        return est_pay
+
     def __eq__(self, other):
         if self.summary == other.summary:
             return True

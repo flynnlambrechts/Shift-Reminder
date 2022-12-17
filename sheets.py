@@ -150,6 +150,8 @@ def row_to_event(headers, row):
         hours=1) if event.start_time == event.end_time else event.end_time
     event.end_time = event.end_time + timedelta(
         days=1) if event.start_time > event.end_time else event.end_time
+
+    event.estimate_pay()
     return event
 
 
