@@ -6,6 +6,8 @@ from keep_alive import keep_alive
 from sheets import get_shifts
 from cal import get_cal_events, calendar_service
 from constants import CALENDAR_ID
+from logbook import write_logbook
+from datetime import datetime
 
 
 # try:
@@ -40,7 +42,7 @@ def earliest_time(shifts):
 
 
 def update_calendar():
-    print("Running...")
+    print("Updating Calendar...")
 
     service = calendar_service()
     shifts = get_shifts()
@@ -86,9 +88,12 @@ def update_calendar():
 if __name__ == "__main__":
     keep_alive()
     while True:
-
+        print(f"""Starting at {datetime.now().strftime("%H:%M %d/%m/%Y")}""")
         update_calendar()
-        print("Sleeping...")
+        print("Sleeping for 1 min.")
+        sleep(60)
+        write_logbook()
+        print("Sleeping for 3hrs")
         # Update every 3hrs
-        sleep(3 * 60 * 60)
+        sleep(3 * 59 * 60)
         
