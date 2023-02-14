@@ -86,6 +86,7 @@ def update_calendar():
 
 
 if __name__ == "__main__":
+    # Test
     keep_alive()
     while True:
         print(f"""Starting at {datetime.now().strftime("%H:%M %d/%m/%Y")}""")
