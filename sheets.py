@@ -9,19 +9,16 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from datetime import datetime, timedelta
-import pandas as pd
+
 from tabulate import tabulate
 
 from constants import SCOPES, TOKEN_PATH, SPREADSHEET_ID, NAME
 from classes import Shift, Event
-from util import date_to_dt, time_to_dt, strip_string_list
+from util import date_to_dt, time_to_dt, strip_string_list, convert_blank_to_none
 
-
+# Data range will need to be changed
 DATA_RANGE = "A3:J100"
 SAMPLE_RANGE_NAME = 'December 2022!A3:J81'
-
-
-
 
 def get_sheets_service():
     creds = None
@@ -73,7 +70,7 @@ def get_sheets():
     return titles
 
 
-def get_future_sheets():
+def get_sheets_from_date(date = None):
     sheets = get_sheets()
     future_sheets = []
     for title in sheets:
@@ -87,12 +84,15 @@ def get_future_sheets():
             except ValueError as err:
                 future_sheets.append(title)
                 continue
-
-        now = datetime.now()
-        # now = datetime(2023, 1, 1)
-        now = datetime(now.year, now.month, 1)
+        if date == None:
+            from_date = datetime.now()
+        else:
+            from_date = date
+        
+        # from_date = datetime(2023, 1, 1)
+        from_date = datetime(from_date.year, from_date.month, 1)
         # print(now.date(), month.date(), month.date() >= now.date(), title)
-        if month.date() >= now.date():
+        if month.date() >= from_date.date():
             future_sheets.append(title)
     return future_sheets
 
@@ -169,12 +169,14 @@ def get_crew_from_row(row, headers):
     raise ValueError(f"No crew found in {row}")
 
 
-def get_shifts():
+def get_shifts(from_date = None):
     shifts = []
 
     # Call the Sheets API
     sheet = get_sheets_service().spreadsheets()
-    titles = get_future_sheets()
+
+    titles = get_sheets_from_date(from_date)
+
     print(f"""Scanning sheets:\n    '{"' '".join(titles)}'""")
     # titles = ["November 2022"]
     for title in titles:
@@ -187,12 +189,7 @@ def get_shifts():
             print('No data found in ', title, ".")
             return
 
-        # Here we convert the data to pandas dataframe
-        # Since otherwise empty cells are left out
-        df = pd.DataFrame(values)
-        df_replace = df.replace([''], [None])
-        # print(tabulate(df, headers='keys', tablefmt='psql'))
-        values = df_replace.values.tolist()
+        values = convert_blank_to_none(values)
 
         headers = values[0]
         for i, row in enumerate(values[1:]):
@@ -206,7 +203,14 @@ def get_shifts():
             except ValueError:
                 continue
 
-    # print(shifts)
+    
+    if from_date != None:
+        temp_shifts = []
+        for i, shift in enumerate(shifts):
+            if shift.start_time.date() >= from_date:
+                temp_shifts.append(shift)
+        shifts = temp_shifts
+        
     return shifts
 
 
