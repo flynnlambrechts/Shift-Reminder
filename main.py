@@ -84,7 +84,6 @@ def update_calendar():
 
 
 if __name__ == "__main__":
-    # Test
     keep_alive()
     while True:
 
