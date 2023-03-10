@@ -91,8 +91,8 @@ if __name__ == "__main__":
     while True:
         print(f"""Starting at {datetime.now().strftime("%H:%M %d/%m/%Y")}""")
         update_calendar()
-        print("Sleeping for 1 min.")
-        sleep(60)
+        print("Sleeping for 30 secs.")
+        sleep(30)
         write_logbook()
         print("Sleeping for 3hrs")
         # Update every 3hrs

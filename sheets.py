@@ -142,6 +142,11 @@ def row_to_event(headers, row):
         event.description += f"Bad End Time: {end_time}\n"
         # print("Bad End Time", end_time)
         end_time = time_to_dt("23:59")
+        
+    if start_time == None or end_time == None:
+        event.description += f"Start or End not provided: {start_time, end_time}\n"
+        start_time = time_to_dt("12:00") if start_time == None else start_time
+        end_time = time_to_dt("23:59") if end_time == None else end_time
 
     event.start_time = datetime.combine(date, start_time)
     event.end_time = datetime.combine(date, end_time)
